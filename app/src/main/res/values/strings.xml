@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">Школьный Дневник</string>
+    <string name="title_planner">Планировщик ДЗ</string>
+    <string name="subtitle_planner">Дневник заданий</string>
+    <string name="filter_all">Все</string>
+    <string name="filter_today">Сегодня</string>
+    <string name="filter_tomorrow">Завтра</string>
+    <string name="filter_pending">К выполнению</string>
+    <string name="filter_completed">Выполнено</string>
+    <string name="search_hint">Поиск по предмету или заданию...</string>
+    <string name="add_homework">Добавить задание</string>
+    <string name="subject">Предмет</string>
+    <string name="task_description">Что задано</string>
+    <string name="due_date">Срок сдачи</string>
+    <string name="priority">Приоритет</string>
+    <string name="priority_normal">Обычный</string>
+    <string name="priority_important">Важный</string>
+    <string name="priority_urgent">Срочно</string>
+    <string name="notes_optional">Заметка (необязательно)</string>
+    <string name="save">Сохранить</string>
+    <string name="cancel">Отмена</string>
+    <string name="delete">Удалить</string>
+    <string name="empty_tasks_title">Заданий нет</string>
+    <string name="empty_tasks_desc">Все домашние задания на этот период выполнены или еще не добавлены</string>
+    <string name="stats_progress">Прогресс</string>
+    <string name="stats_completed_ratio">выполнено</string>
+    <string name="clear_completed">Очистить выполненные</string>
+    <string name="quick_add_demo">Добавить примеры ДЗ</string>
+</resources>
