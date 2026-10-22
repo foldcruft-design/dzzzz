@@ -1,9 +1,21 @@
 package com.example.ui.components
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -23,7 +35,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -33,10 +44,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.testTag
@@ -55,7 +70,7 @@ import com.example.ui.theme.PlatinumWhite
 import com.example.ui.theme.SteelGrey
 
 /**
- * Full screen glass backdrop with deep graphite-charcoal gradient and frosted specular highlights.
+ * Deep graphite/charcoal backdrop with soft atmospheric glass reflections.
  */
 @Composable
 fun GlassBackground(
@@ -68,18 +83,36 @@ fun GlassBackground(
         Brush.verticalGradient(
           colors = listOf(
             GlassDarkBgStart,
-            Color(0xFF121418),
+            Color(0xFF13151A),
+            Color(0xFF0F1014),
             GlassDarkBgEnd
           )
         )
       )
+      .drawBehind {
+        // Subtle ambient frosted highlights
+        drawCircle(
+          brush = Brush.radialGradient(
+            colors = listOf(Color(0x0CFFFFFF), Color.Transparent),
+            center = Offset(size.width * 0.85f, size.height * 0.1f),
+            radius = size.width * 0.7f
+          )
+        )
+        drawCircle(
+          brush = Brush.radialGradient(
+            colors = listOf(Color(0x08FFFFFF), Color.Transparent),
+            center = Offset(size.width * 0.15f, size.height * 0.85f),
+            radius = size.width * 0.6f
+          )
+        )
+      }
   ) {
     content()
   }
 }
 
 /**
- * Elegant frosted glass card with metallic specular border.
+ * Frosted glass card with dual-layer specular edge illumination.
  */
 @Composable
 fun GlassCard(
@@ -90,8 +123,9 @@ fun GlassCard(
     1.dp,
     Brush.verticalGradient(
       colors = listOf(
-        GlassBorder,
-        GlassBorderSubtle
+        Color(0x45FFFFFF),
+        Color(0x18FFFFFF),
+        Color(0x08FFFFFF)
       )
     )
   ),
@@ -108,7 +142,7 @@ fun GlassCard(
 }
 
 /**
- * Animated tactile glass button with bouncy spring scale on press and frosted aesthetic.
+ * Animated tactile glass button with bouncy spring scale on press.
  */
 @Composable
 fun GlassButton(
@@ -122,7 +156,7 @@ fun GlassButton(
 ) {
   var isPressed by remember { mutableStateOf(false) }
   val scale by animateFloatAsState(
-    targetValue = if (isPressed) 0.93f else 1.0f,
+    targetValue = if (isPressed) 0.92f else 1.0f,
     animationSpec = spring(
       dampingRatio = Spring.DampingRatioMediumBouncy,
       stiffness = Spring.StiffnessMedium
@@ -133,8 +167,9 @@ fun GlassButton(
   val bgBrush = if (isPrimary) {
     Brush.verticalGradient(
       colors = listOf(
-        Color(0x38FFFFFF),
-        Color(0x1AFFFFFF)
+        Color(0x40FFFFFF),
+        Color(0x22FFFFFF),
+        Color(0x15FFFFFF)
       )
     )
   } else {
@@ -159,7 +194,7 @@ fun GlassButton(
           1.dp,
           Brush.verticalGradient(
             colors = listOf(
-              if (isPrimary) Color(0x45FFFFFF) else Color(0x22FFFFFF),
+              if (isPrimary) Color(0x60FFFFFF) else Color(0x28FFFFFF),
               Color(0x10FFFFFF)
             )
           )
@@ -221,7 +256,7 @@ fun GlassIconButton(
   onClick: () -> Unit,
   modifier: Modifier = Modifier,
   contentDescription: String,
-  size: Dp = 44.dp,
+  size: Dp = 42.dp,
   tint: Color = PlatinumWhite,
   shape: Shape = CircleShape,
   testTag: String = "glass_icon_button"
@@ -245,7 +280,7 @@ fun GlassIconButton(
       .background(
         Brush.verticalGradient(
           colors = listOf(
-            if (isPressed) GlassSurfacePressed else Color(0x20FFFFFF),
+            if (isPressed) GlassSurfacePressed else Color(0x22FFFFFF),
             Color(0x0CFFFFFF)
           )
         )
@@ -255,7 +290,7 @@ fun GlassIconButton(
           1.dp,
           Brush.verticalGradient(
             colors = listOf(
-              Color(0x3AFFFFFF),
+              Color(0x45FFFFFF),
               Color(0x10FFFFFF)
             )
           )
@@ -283,7 +318,7 @@ fun GlassIconButton(
       imageVector = icon,
       contentDescription = contentDescription,
       tint = tint,
-      modifier = Modifier.size(20.dp)
+      modifier = Modifier.size(19.dp)
     )
   }
 }
@@ -302,7 +337,7 @@ fun GlassChip(
 ) {
   var isPressed by remember { mutableStateOf(false) }
   val scale by animateFloatAsState(
-    targetValue = if (isPressed) 0.94f else 1.0f,
+    targetValue = if (isPressed) 0.93f else 1.0f,
     animationSpec = spring(
       dampingRatio = Spring.DampingRatioMediumBouncy,
       stiffness = Spring.StiffnessMedium
@@ -313,20 +348,20 @@ fun GlassChip(
   val bgBrush = if (selected) {
     Brush.verticalGradient(
       colors = listOf(
-        Color(0x40FFFFFF),
-        Color(0x26FFFFFF)
+        Color(0x45FFFFFF),
+        Color(0x28FFFFFF)
       )
     )
   } else {
     Brush.verticalGradient(
       colors = listOf(
-        Color(0x12FFFFFF),
+        Color(0x14FFFFFF),
         Color(0x08FFFFFF)
       )
     )
   }
 
-  val borderColor = if (selected) Color(0x55FFFFFF) else Color(0x1AFFFFFF)
+  val borderColor = if (selected) Color(0x65FFFFFF) else Color(0x1EFFFFFF)
   val textColor = if (selected) PlatinumWhite else SteelGrey
   val shape = RoundedCornerShape(14.dp)
 
@@ -367,8 +402,8 @@ fun GlassChip(
         Box(
           modifier = Modifier
             .clip(CircleShape)
-            .background(if (selected) Color(0x33FFFFFF) else Color(0x1AFFFFFF))
-            .padding(horizontal = 6.dp, vertical = 2.dp)
+            .background(if (selected) Color(0x38FFFFFF) else Color(0x1CFFFFFF))
+            .padding(horizontal = 7.dp, vertical = 2.dp)
         ) {
           Text(
             text = count.toString(),
@@ -383,7 +418,64 @@ fun GlassChip(
 }
 
 /**
- * Animated Glass Progress Bar with frosted track and glowing silver progress indicator.
+ * Circular Glass Ring Meter showing percentage with smooth spring sweep.
+ */
+@Composable
+fun GlassCircularMeter(
+  progress: Float, // 0f..1f
+  modifier: Modifier = Modifier,
+  sizeDp: Dp = 60.dp
+) {
+  val animatedProgress by animateFloatAsState(
+    targetValue = progress.coerceIn(0f, 1f),
+    animationSpec = spring(
+      dampingRatio = Spring.DampingRatioNoBouncy,
+      stiffness = Spring.StiffnessLow
+    ),
+    label = "circular_meter_anim"
+  )
+
+  Box(
+    modifier = modifier.size(sizeDp),
+    contentAlignment = Alignment.Center
+  ) {
+    Canvas(modifier = Modifier.size(sizeDp)) {
+      val strokeWidth = 5.dp.toPx()
+      // Background track
+      drawCircle(
+        color = Color(0x1EFFFFFF),
+        style = Stroke(width = strokeWidth)
+      )
+      // Progress arc
+      if (animatedProgress > 0.005f) {
+        drawArc(
+          brush = Brush.sweepGradient(
+            colors = listOf(
+              Color(0x70FFFFFF),
+              PlatinumWhite,
+              Color(0x90FFFFFF)
+            )
+          ),
+          startAngle = -90f,
+          sweepAngle = 360f * animatedProgress,
+          useCenter = false,
+          style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
+        )
+      }
+    }
+
+    val percent = (animatedProgress * 100).toInt()
+    Text(
+      text = "$percent%",
+      color = PlatinumWhite,
+      fontSize = 12.sp,
+      fontWeight = FontWeight.Bold
+    )
+  }
+}
+
+/**
+ * Animated Glass Progress Bar with frosted track and glowing silver fill.
  */
 @Composable
 fun GlassProgressBar(
@@ -403,8 +495,8 @@ fun GlassProgressBar(
     modifier = modifier
       .height(10.dp)
       .clip(CircleShape)
-      .background(Color(0x14FFFFFF))
-      .border(BorderStroke(0.5.dp, Color(0x1FFFFFFF)), CircleShape)
+      .background(Color(0x16FFFFFF))
+      .border(BorderStroke(0.5.dp, Color(0x25FFFFFF)), CircleShape)
   ) {
     Box(
       modifier = Modifier
@@ -414,7 +506,7 @@ fun GlassProgressBar(
         .background(
           Brush.horizontalGradient(
             colors = listOf(
-              Color(0x60FFFFFF),
+              Color(0x70FFFFFF),
               PlatinumWhite
             )
           )

@@ -6,7 +6,6 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -36,9 +35,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -67,13 +66,11 @@ import com.example.ui.components.GlassBackground
 import com.example.ui.components.GlassButton
 import com.example.ui.components.GlassCard
 import com.example.ui.components.GlassChip
+import com.example.ui.components.GlassCircularMeter
 import com.example.ui.components.GlassIconButton
 import com.example.ui.components.GlassProgressBar
 import com.example.ui.components.HomeworkCard
-import com.example.ui.theme.DarkElevated
 import com.example.ui.theme.FrostedSilver
-import com.example.ui.theme.GlassBorder
-import com.example.ui.theme.GlassBorderSubtle
 import com.example.ui.theme.PlatinumWhite
 import com.example.ui.theme.SteelGrey
 import com.example.ui.viewmodel.FilterType
@@ -95,7 +92,7 @@ fun HomeworkScreen(
         .navigationBarsPadding(),
       containerColor = Color.Transparent,
       floatingActionButton = {
-        // Frosted Glass Floating Action Button
+        // Frosted Glass Floating Action Button with spring scale
         var isFabPressed by remember { mutableStateOf(false) }
         val fabScale by animateFloatAsState(
           targetValue = if (isFabPressed) 0.88f else 1.0f,
@@ -115,8 +112,9 @@ fun HomeworkScreen(
             .background(
               Brush.verticalGradient(
                 listOf(
-                  Color(0x50FFFFFF),
-                  Color(0x25FFFFFF)
+                  Color(0x60FFFFFF),
+                  Color(0x30FFFFFF),
+                  Color(0x18FFFFFF)
                 )
               )
             )
@@ -125,8 +123,8 @@ fun HomeworkScreen(
                 1.5.dp,
                 Brush.verticalGradient(
                   listOf(
-                    Color(0x80FFFFFF),
-                    Color(0x25FFFFFF)
+                    Color(0x90FFFFFF),
+                    Color(0x35FFFFFF)
                   )
                 )
               ),
@@ -176,7 +174,7 @@ fun HomeworkScreen(
               letterSpacing = 0.5.sp
             )
             Text(
-              text = "Планировщик ДЗ • Беларусь",
+              text = "Белорусская школьная программа",
               color = SteelGrey,
               fontSize = 12.sp,
               fontWeight = FontWeight.Normal
@@ -196,6 +194,18 @@ fun HomeworkScreen(
             )
 
             Spacer(modifier = Modifier.width(8.dp))
+
+            if (uiState.completedCount > 0) {
+              GlassIconButton(
+                icon = Icons.Default.DeleteSweep,
+                onClick = { viewModel.clearCompleted() },
+                contentDescription = "Очистить выполненные",
+                size = 40.dp,
+                tint = SteelGrey,
+                testTag = "clear_completed_btn"
+              )
+              Spacer(modifier = Modifier.width(8.dp))
+            }
 
             GlassIconButton(
               icon = Icons.Default.AutoAwesome,
@@ -220,7 +230,7 @@ fun HomeworkScreen(
               onValueChange = { viewModel.setSearchQuery(it) },
               placeholder = {
                 Text(
-                  "Поиск по предмету или заданию...",
+                  "Поиск по предмету, заданию или заметке...",
                   color = SteelGrey,
                   fontSize = 13.sp
                 )
@@ -260,7 +270,7 @@ fun HomeworkScreen(
           }
         }
 
-        // Progress Glass Card
+        // Enhanced Glass Dashboard with Circular Meter & Progress
         GlassCard(
           modifier = Modifier
             .fillMaxWidth()
@@ -273,37 +283,35 @@ fun HomeworkScreen(
               horizontalArrangement = Arrangement.SpaceBetween,
               verticalAlignment = Alignment.CenterVertically
             ) {
-              Column {
+              Column(modifier = Modifier.weight(1f)) {
                 Text(
                   text = "Прогресс выполнения",
                   color = PlatinumWhite,
-                  fontSize = 15.sp,
+                  fontSize = 16.sp,
                   fontWeight = FontWeight.SemiBold
                 )
+                Spacer(modifier = Modifier.height(2.dp))
+                val statusText = if (uiState.totalCount > 0 && uiState.completedCount == uiState.totalCount) {
+                  "Все задания выполнены! Отличная работа 🎉"
+                } else {
+                  "${uiState.completedCount} из ${uiState.totalCount} заданий выполнено"
+                }
                 Text(
-                  text = "${uiState.completedCount} из ${uiState.totalCount} заданий выполнено",
+                  text = statusText,
                   color = SteelGrey,
                   fontSize = 12.sp
                 )
               }
 
-              val percent = (uiState.completionRatio * 100).toInt()
-              Box(
-                modifier = Modifier
-                  .clip(RoundedCornerShape(10.dp))
-                  .background(Color(0x20FFFFFF))
-                  .padding(horizontal = 10.dp, vertical = 4.dp)
-              ) {
-                Text(
-                  text = "$percent%",
-                  color = PlatinumWhite,
-                  fontSize = 14.sp,
-                  fontWeight = FontWeight.Bold
-                )
-              }
+              Spacer(modifier = Modifier.width(12.dp))
+
+              GlassCircularMeter(
+                progress = uiState.completionRatio,
+                sizeDp = 52.dp
+              )
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             GlassProgressBar(progress = uiState.completionRatio)
           }
@@ -357,11 +365,11 @@ fun HomeworkScreen(
               modifier = Modifier
                 .testTag("subject_chip_${subjName.replace(" ", "_")}")
                 .clip(RoundedCornerShape(12.dp))
-                .background(if (isSelected) Color(0x35FFFFFF) else Color(0x10FFFFFF))
+                .background(if (isSelected) Color(0x38FFFFFF) else Color(0x12FFFFFF))
                 .border(
                   BorderStroke(
                     1.dp,
-                    if (isSelected) Color(0x50FFFFFF) else Color(0x14FFFFFF)
+                    if (isSelected) Color(0x55FFFFFF) else Color(0x16FFFFFF)
                   ),
                   RoundedCornerShape(12.dp)
                 )
@@ -406,9 +414,10 @@ fun HomeworkScreen(
               ) {
                 Box(
                   modifier = Modifier
-                    .size(54.dp)
+                    .size(56.dp)
                     .clip(CircleShape)
-                    .background(Color(0x1AFFFFFF)),
+                    .background(Color(0x1CFFFFFF))
+                    .border(BorderStroke(1.dp, Color(0x30FFFFFF)), CircleShape),
                   contentAlignment = Alignment.Center
                 ) {
                   Icon(

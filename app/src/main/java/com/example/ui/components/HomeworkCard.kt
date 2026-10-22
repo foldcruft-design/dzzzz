@@ -1,6 +1,7 @@
 package com.example.ui.components
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -47,10 +48,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.BelarusianSubjectsProvider
 import com.example.data.HomeworkItem
-import com.example.ui.theme.DarkElevated
 import com.example.ui.theme.FrostedSilver
-import com.example.ui.theme.GlassBorder
-import com.example.ui.theme.GlassBorderSubtle
 import com.example.ui.theme.PlatinumWhite
 import com.example.ui.theme.SteelGrey
 import java.time.LocalDate
@@ -73,6 +71,7 @@ fun HomeworkCard(
     when (diff) {
       0L -> "Сегодня"
       1L -> "Завтра"
+      2L -> "Послезавтра"
       -1L -> "Вчера (просрочено)"
       in -999L..-2L -> "Просрочено (${date.format(DateTimeFormatter.ofPattern("d MMM", Locale("ru")))})"
       else -> date.format(DateTimeFormatter.ofPattern("d MMM", Locale("ru")))
@@ -89,7 +88,7 @@ fun HomeworkCard(
 
   var isCardPressed by remember { mutableStateOf(false) }
   val cardScale by animateFloatAsState(
-    targetValue = if (isCardPressed) 0.985f else 1.0f,
+    targetValue = if (isCardPressed) 0.982f else 1.0f,
     animationSpec = spring(
       dampingRatio = Spring.DampingRatioMediumBouncy,
       stiffness = Spring.StiffnessMedium
@@ -97,20 +96,23 @@ fun HomeworkCard(
     label = "card_scale"
   )
 
-  val cardBg = if (item.isCompleted) {
-    Color(0x0EFFFFFF)
-  } else when (item.priority) {
-    2 -> Color(0x24FFFFFF)
-    1 -> Color(0x1AFFFFFF)
-    else -> Color(0x14FFFFFF)
-  }
+  val cardBg by animateColorAsState(
+    targetValue = if (item.isCompleted) {
+      Color(0x0CFFFFFF)
+    } else when (item.priority) {
+      2 -> Color(0x28FFFFFF)
+      1 -> Color(0x1EFFFFFF)
+      else -> Color(0x16FFFFFF)
+    },
+    label = "card_bg_color"
+  )
 
-  val borderColor = if (item.isCompleted) {
-    Color(0x14FFFFFF)
+  val topBorderColor = if (item.isCompleted) {
+    Color(0x18FFFFFF)
   } else when (item.priority) {
-    2 -> Color(0x55FFFFFF)
-    1 -> Color(0x35FFFFFF)
-    else -> Color(0x20FFFFFF)
+    2 -> Color(0x65FFFFFF)
+    1 -> Color(0x45FFFFFF)
+    else -> Color(0x28FFFFFF)
   }
 
   Box(
@@ -118,19 +120,20 @@ fun HomeworkCard(
       .testTag("homework_card_${item.id}")
       .fillMaxWidth()
       .scale(cardScale)
-      .clip(RoundedCornerShape(20.dp))
+      .clip(RoundedCornerShape(22.dp))
       .background(cardBg)
       .border(
         BorderStroke(
           1.dp,
           Brush.verticalGradient(
             colors = listOf(
-              borderColor,
-              Color(0x0AFFFFFF)
+              topBorderColor,
+              Color(0x15FFFFFF),
+              Color(0x06FFFFFF)
             )
           )
         ),
-        RoundedCornerShape(20.dp)
+        RoundedCornerShape(22.dp)
       )
       .pointerInput(Unit) {
         awaitEachGesture {
@@ -155,14 +158,14 @@ fun HomeworkCard(
           verticalAlignment = Alignment.CenterVertically,
           modifier = Modifier.weight(1f, fill = false)
         ) {
-          // Subject Short Code Pill
+          // Subject Short Code Pill with frosted border
           val code = subjectObj?.shortCode ?: item.subject.take(3).uppercase()
           Box(
             modifier = Modifier
               .clip(RoundedCornerShape(8.dp))
-              .background(Color(0x22FFFFFF))
-              .border(BorderStroke(0.5.dp, Color(0x33FFFFFF)), RoundedCornerShape(8.dp))
-              .padding(horizontal = 6.dp, vertical = 2.dp)
+              .background(Color(0x25FFFFFF))
+              .border(BorderStroke(0.5.dp, Color(0x40FFFFFF)), RoundedCornerShape(8.dp))
+              .padding(horizontal = 7.dp, vertical = 3.dp)
           ) {
             Text(
               text = code,
@@ -191,15 +194,15 @@ fun HomeworkCard(
             Box(
               modifier = Modifier
                 .clip(RoundedCornerShape(8.dp))
-                .background(if (item.priority == 2) Color(0x40FFFFFF) else Color(0x20FFFFFF))
+                .background(if (item.priority == 2) Color(0x45FFFFFF) else Color(0x24FFFFFF))
                 .border(
                   BorderStroke(
                     0.5.dp,
-                    if (item.priority == 2) Color(0x60FFFFFF) else Color(0x30FFFFFF)
+                    if (item.priority == 2) Color(0x70FFFFFF) else Color(0x35FFFFFF)
                   ),
                   RoundedCornerShape(8.dp)
                 )
-                .padding(horizontal = 6.dp, vertical = 2.dp)
+                .padding(horizontal = 7.dp, vertical = 2.dp)
             ) {
               Text(
                 text = if (item.priority == 2) "Срочно" else "Важно",
@@ -211,12 +214,19 @@ fun HomeworkCard(
             Spacer(modifier = Modifier.width(6.dp))
           }
 
-          // Date badge
+          // Date badge with glass styling
           Box(
             modifier = Modifier
               .clip(RoundedCornerShape(8.dp))
-              .background(if (isOverdue) Color(0x30FFFFFF) else Color(0x15FFFFFF))
-              .padding(horizontal = 7.dp, vertical = 3.dp)
+              .background(if (isOverdue) Color(0x35FFFFFF) else Color(0x18FFFFFF))
+              .border(
+                BorderStroke(
+                  0.5.dp,
+                  if (isOverdue) Color(0x55FFFFFF) else Color(0x20FFFFFF)
+                ),
+                RoundedCornerShape(8.dp)
+              )
+              .padding(horizontal = 8.dp, vertical = 3.dp)
           ) {
             Text(
               text = dateText,
@@ -228,17 +238,17 @@ fun HomeworkCard(
         }
       }
 
-      Spacer(modifier = Modifier.height(10.dp))
+      Spacer(modifier = Modifier.height(12.dp))
 
       // Middle Row: Checkbox + Task text
       Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.Top
       ) {
-        // Animated Checkbox button
+        // Animated Checkbox button with tactile spring bounce
         var isCheckPressed by remember { mutableStateOf(false) }
         val checkScale by animateFloatAsState(
-          targetValue = if (isCheckPressed) 0.82f else 1.0f,
+          targetValue = if (isCheckPressed) 0.80f else 1.0f,
           animationSpec = spring(
             dampingRatio = Spring.DampingRatioMediumBouncy,
             stiffness = Spring.StiffnessMedium
@@ -249,20 +259,20 @@ fun HomeworkCard(
         Box(
           modifier = Modifier
             .testTag("checkbox_${item.id}")
-            .size(28.dp)
+            .size(30.dp)
             .scale(checkScale)
             .clip(CircleShape)
             .background(
               if (item.isCompleted) Brush.verticalGradient(
-                listOf(Color(0x60FFFFFF), Color(0x40FFFFFF))
+                listOf(Color(0x75FFFFFF), Color(0x45FFFFFF))
               ) else Brush.verticalGradient(
-                listOf(Color(0x15FFFFFF), Color(0x08FFFFFF))
+                listOf(Color(0x18FFFFFF), Color(0x0AFFFFFF))
               )
             )
             .border(
               BorderStroke(
                 1.5.dp,
-                if (item.isCompleted) Color(0x80FFFFFF) else Color(0x35FFFFFF)
+                if (item.isCompleted) Color(0x90FFFFFF) else Color(0x38FFFFFF)
               ),
               CircleShape
             )
@@ -283,8 +293,8 @@ fun HomeworkCard(
             Icon(
               imageVector = Icons.Default.Check,
               contentDescription = "Выполнено",
-              tint = Color(0xFF111317),
-              modifier = Modifier.size(16.dp)
+              tint = Color(0xFF101216),
+              modifier = Modifier.size(17.dp)
             )
           }
         }
@@ -302,15 +312,16 @@ fun HomeworkCard(
             textDecoration = if (item.isCompleted) TextDecoration.LineThrough else TextDecoration.None
           )
 
-          // Notes
+          // Notes with frosted glass background
           if (item.notes.isNotBlank()) {
-            Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             Box(
               modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(10.dp))
-                .background(Color(0x10FFFFFF))
-                .padding(horizontal = 8.dp, vertical = 4.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(Color(0x12FFFFFF))
+                .border(BorderStroke(0.5.dp, Color(0x18FFFFFF)), RoundedCornerShape(12.dp))
+                .padding(horizontal = 10.dp, vertical = 5.dp)
             ) {
               Text(
                 text = "Заметка: ${item.notes}",

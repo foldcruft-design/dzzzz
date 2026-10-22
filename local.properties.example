@@ -1,0 +1,14 @@
+## Пример файла конфигурации локального Android SDK для локальной сборки на ПК
+## Скопируйте этот файл как local.properties и укажите реальный путь к вашему Android SDK:
+##
+## Для Linux:
+## sdk.dir=/home/username/Android/Sdk
+##
+## Для macOS:
+## sdk.dir=/Users/username/Library/Android/sdk
+##
+## Для Windows:
+## sdk.dir=C\:\\Users\\username\\AppData\\Local\\Android\\Sdk
+##
+## В CodeAssist на Android путь к SDK обычно конфигурируется автоматически самой средой.
+sdk.dir=/home/user/Android/Sdk
